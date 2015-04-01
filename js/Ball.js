@@ -6,35 +6,30 @@ function(Konva){
 	Ball.prototype = {
 		collCoeff: 0.7,
 		frict: 0.0004,
-		init:function(){},
+		init:function(){this.block=false;},
 		create: function(x, y, radius, color, vx, vy, world){
-			
+			this.world = world;
 			this.x = x; this.y = y;
 			this.vx = vx; this.vy = vy;
 			this.radius = radius;
-
-			this.circle = new Konva.Circle({
-			  radius: world.scale * radius,
-			  fill: color,
-			  stroke: 'black',
-			  strokeWidth: 5,
-			  x: x,
-			  y: y
-			});
-			this.circle.on('click', this.onclick(world));
-	
-			world.layer.add(this.circle);
-		},
-		onclick: function(world){
-			
-			var that = this;
-			var world = world;
-			return function(evt){
-				that.vy = 0.2*(that.y - world.screenToWorld(evt.evt.y, true))/that.radius;
-				that.vx = 0.2*(that.x - world.screenToWorld(evt.evt.x, false))/that.radius;
+			this.color = color;
+			this.varray = [];
+			this.vn = 100;
+			this.maxV = 0.00001;
+			for(var i = 0; i < this.vn; i++){
+				this.varray[i] = 0.00001;
 			}
+			this.vcursor = 0;
+		},
+		punch: function(x, y){
+			
+			this.vy = 0.2*(this.y - y)/this.radius;
+			this.vx = 0.2*(this.x -x)/this.radius;
+			
 		},
 		step: function(world){
+			if (this.block) return;
+			
 			this.vy += world.g;
 			
 			this.y += this.vy; this.x += this.vx;
@@ -53,13 +48,59 @@ function(Konva){
 			if(this.x + this.radius > world.worldWidth){
 				this.vx = -this.vx*this.collCoeff;
 				this.x = 2*world.worldWidth-this.x-2*this.radius;
-			}
-			
-			this.updateXY(world);
+			}	
+			this.vcursor++;
+			if(this.vcursor>=this.vn) this.vcursor = 0;	
+			var v = Math.sqrt(this.vx*this.vx+this.vy*this.vy);
+			this.varray[this.vcursor] = v;
+			this.maxV = Math.max(this.maxV,v);
 		},
-		updateXY: function(world){
-			this.circle.x(world.worldToScreen(this.x, false));
-			this.circle.y(world.worldToScreen(this.y, true));
+		draw: function(ctx){
+			ctx.beginPath();
+			ctx.fillStyle = this.color;
+			ctx.strokeStyle = 'black';
+			ctx.lineWidth = 5;
+			ctx.arc(this.world.worldToScreen(this.x), this.world.worldToScreen(this.y, true)
+			, this.world.worldToScreen(this.radius), 0, 2*Math.PI);
+			
+			ctx.fill();
+			ctx.stroke();
+			
+			ctx.beginPath();
+			ctx.strokeStyle = this.color;
+			ctx.lineWidth = 2;
+			
+			
+			var x0 = 0;
+			var y0 = this.world.height/2;
+			var step = this.world.width/(this.vn-2);
+			var x = x0;
+			
+			ctx.moveTo(x0, y0);
+			var i = this.vcursor+1;
+			if(i >= this.vn) i=0;
+			ctx.moveTo(x, y0+this.world.height*0.3*this.varray[i]/this.maxV)
+			i++;x += step;
+			var mult = this.world.height*0.3/this.maxV;
+			while( i != this.vcursor){
+				
+				
+				ctx.lineTo(x, y0-mult*this.varray[i]);
+				x += step;
+				if(x > this.world.width) {
+					x = 0;
+					ctx.moveTo(x, y0);
+				}
+				i++;
+				if(i >= this.vn) i=0;
+			}
+			ctx.stroke();
+		},
+		click: function(x, y){
+			var d  = Math.sqrt((this.x-x)*(this.x-x)+(this.y-y)*(this.y-y));
+			if(d < this.radius){
+				this.punch(x, y);
+			}
 		}
 	}
 	return Ball;
