@@ -50,10 +50,6 @@ function(Konva, Ball){
 			this.steps = 0;
 			this.balls = [];
 			this.nballs = 0;
-			var that = this;
-            
-            
-            
             this.playing = false;
             window.onresize = this.resize();
             
@@ -121,7 +117,7 @@ function(Konva, Ball){
 		play: function(){
 			this.playing = true;
 			console.log('playing...');
-			this.run;
+			this.run();
 		},
 		pause: function() {
 			this.playing = false;
