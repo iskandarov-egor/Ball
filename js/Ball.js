@@ -59,7 +59,7 @@ function(Konva){
 			ctx.beginPath();
 			ctx.fillStyle = this.color;
 			ctx.strokeStyle = 'black';
-			ctx.lineWidth = 5;
+			ctx.lineWidth = 4;
 			ctx.arc(this.world.worldToScreen(this.x), this.world.worldToScreen(this.y, true)
 			, this.world.worldToScreen(this.radius), 0, 2*Math.PI);
 			
@@ -67,9 +67,21 @@ function(Konva){
 			ctx.stroke();
 			
 			ctx.beginPath();
-			ctx.strokeStyle = this.color;
+
+			var strokeColor = "#000000";
+			try {
+				var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(this.color);
+				var r = parseInt(result[1], 16);
+				var	g = parseInt(result[2], 16);
+				var	b = parseInt(result[3], 16);
+				strokeColor = 'rgba(' + r + ', ' + g + ', ' + b + ', 0.2)';
+			} catch (e) {
+				console.error(e);
+			}
+
+			ctx.strokeStyle = strokeColor;
+
 			ctx.lineWidth = 2;
-			
 			
 			var x0 = 0;
 			var y0 = this.world.height/2;
@@ -83,7 +95,6 @@ function(Konva){
 			i++;x += step;
 			var mult = this.world.height*0.3/this.maxV;
 			while( i != this.vcursor){
-				
 				
 				ctx.lineTo(x, y0-mult*this.varray[i]);
 				x += step;

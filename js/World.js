@@ -50,10 +50,6 @@ function(Konva, Ball){
 			this.steps = 0;
 			this.balls = [];
 			this.nballs = 0;
-			var that = this;
-            
-            
-            
             this.playing = false;
             window.onresize = this.resize();
             
@@ -118,10 +114,16 @@ function(Konva, Ball){
 			
 				
 		},
+		shake: function() {
+			for(var i = 0; i < this.balls.length; ++i) {
+				this.balls[i].vx = (Math.random() - 0.5) * 0.2;
+				this.balls[i].vy = Math.random() * 0.1;
+			}
+		},
 		play: function(){
 			this.playing = true;
 			console.log('playing...');
-			this.run;
+			this.run();
 		},
 		pause: function() {
 			this.playing = false;
