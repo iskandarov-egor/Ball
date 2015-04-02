@@ -114,6 +114,12 @@ function(Konva, Ball){
 			
 				
 		},
+		shake: function() {
+			for(var i = 0; i < this.balls.length; ++i) {
+				this.balls[i].vx = (Math.random() - 0.5) * 0.2;
+				this.balls[i].vy = Math.random() * 0.1;
+			}
+		},
 		play: function(){
 			this.playing = true;
 			console.log('playing...');

@@ -25,14 +25,27 @@ require([
 	var sonicServer = new SonicServer({alphabet: ALPHABET});
 	sonicServer.start();
 	sonicServer.on('message', function(message) {
-		// radius;color
-		// 12;00796b
-		var messageParts = message.split(';');
-		var radius = messageParts[0] / 30;
-		var color = "#" + messageParts[1];
 		console.log(message);
-		world.addBall(3 * width * Math.random() / height, 4, radius, 0, 0, color);
+
+		try {
+			handleMessage(message);
+		} catch (exception) {
+			console.error(exception);
+		}
 	});
+
+	function handleMessage(message) {
+		if (message == "1") {
+			world.shake();
+			return;
+		}
+
+		var messageParts = message.split(';');
+		var radius = messageParts[0] / 300;
+		var color = "#" + messageParts[1];
+
+		world.addBall(3 * width * Math.random() / height, 4, radius, 0, 0, color);
+	}
 
 	function keyDown(e) {
 		if (e.keyCode == 32) {
@@ -43,6 +56,8 @@ require([
 		} else if (e.keyCode == 13) {
 			var colorId = parseInt(Math.random() * ACCENT_COLORS.length);
 			world.addBall(3 * width * Math.random() / height, 4, Math.random() * 0.3 + 0.05, 0, 0, ACCENT_COLORS[colorId]);
+		} else if (e.keyCode == 83) {
+			world.shake();
 		}
 	}
 

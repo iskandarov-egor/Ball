@@ -68,13 +68,18 @@ function(Konva){
 			
 			ctx.beginPath();
 
+			var strokeColor = "#000000";
+			try {
+				var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(this.color);
+				var r = parseInt(result[1], 16);
+				var	g = parseInt(result[2], 16);
+				var	b = parseInt(result[3], 16);
+				strokeColor = 'rgba(' + r + ', ' + g + ', ' + b + ', 0.2)';
+			} catch (e) {
+				console.error(e);
+			}
 
-			var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(this.color);
-			var r = parseInt(result[1], 16);
-			var	g = parseInt(result[2], 16);
-			var	b = parseInt(result[3], 16);
-
-			ctx.strokeStyle = 'rgba(' + r + ', ' + g + ', ' + b + ', 0.1)';
+			ctx.strokeStyle = strokeColor;
 
 			ctx.lineWidth = 2;
 			
